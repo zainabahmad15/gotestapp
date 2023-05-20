@@ -208,7 +208,7 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     
     s1 :="this is a string"
     s2 :="this is also a string"
-    fmt.Printf("%v,%T\n",s1 + s2, s1 + s2) //string concatination
+    fmt.Printf("%v,%T\n",s1 + s2, s1 + s2) //string concatenation
 
     s := "this is a string"
     b := []byte(s) //byte slices
@@ -218,12 +218,128 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
   - Rune \
     runes are utf8 32bit characters \
     Runes are alias for int32 \
-	`r:='a'` or    `var r rune = 'a'` \
-    Any utf8 8bit character can also be a valid utf8 32bit character \ 
+	`r:='a'` or `var r rune = 'a'` \
+    Any utf8 8bit character can also be a valid utf8 32bit character \
 	For declaring runes we use single quotes but for strings we use double quotes \
 	`fmt.Printf("%v,%T\n",r,r)` // 97, int32 
    
-  
+## Constants
+ - Naming constants \
+  `const myConst int = 42 ` // use camel casing, change first character to uppercase to make it global \
+  `myConst = 45` // compile time error \
+  `fmt.Printf("%v,%T\n",myConst,myConst)` //42, int \
+- Constants should be assignable at compile time. you cannot do \
+  `const myConst float64 = math.Sin(1.57)` // this doesnt compile since it requires function to be executed which is done on runtime where as constants are to be given values before runtime 
+- Constants can be of any type i.e. int, string, float, bool, etc.
+- Arrays are always going to variable types. you cannot declare an array constant.
+- Constants are immutable, but can be shadowed
+    ```
+    const i int16 = 11
+
+    func main () {
+            const i int = 9
+            fmt.Printf("%v,%T\n",a,a) // prints 9, int 
+            // shadowing by inner most scope
+    }
+    ```
+- Operations 
+    ```
+    const a = 42 //another method to declare constants
+    var b int = 10
+
+	// if const a int = 42, var b int16 = 10 // type mismatch error 
+
+	fmt.Printf("%v,%T\n",a+b,a+b) //prints 52, int
+    / /compiler reads it as fmt.Printf("%v,%T\n", 42+b, 42+b)
+    //in case of constants, type mismatch error does not occur, if we have not specified data type of constant. Go implicitly parses the constant
+    ```
+- Enumerated constants
+  ```
+  package main
+
+  import (
+    "fmt"
+  )
+
+  // const a = iota 
+  // iota is a counter that can be used while creating enumerated constants
+  // An enum is a special "class" that represents a group of constants
+
+  // const block can be used to created enumerated constants
+  const (
+    a = iota
+    b = iota
+    c = iota
+
+    // if we dont assign the vaule of constant after 1st one, compiler will establish the pattern 
+    a = iota
+    b // compiler will assign b = iota itself
+    c
+    
+  )
+
+  // iota is scoped to its own constant block
+  const (
+    a2 = iota
+  )
+
+  const (
+    _ = iota // Go's only write only variable "underscore"
+    // memory is not used
+    // if we dont need 0 value of iota
+
+    y 
+  )
+
+  func main () {
+    fmt.Printf(%v, %T\n, a, a) // prints 0, int 
+
+    // iota changes value as the constants are evaluated
+    //fmt.Printf("%v,%T\n",a,a)   // prints 0 
+	//fmt.Printf("%v,%T\n",b,b)   // prints 1
+	//fmt.Printf("%v,%T\n",c,c)   // prints 2
+
+
+	//fmt.Printf("%v,%T\n",a2,a2) // prints 0
+
+    var x int
+	fmt.Printf("%v\n",x == a2) // prints true since an uninitialised variable = 0 
+
+    fmt.Printf("%v\n",y ) // prints 1 - we can also shift by using _ = iota + 5 so that it prints 6 
+  }
+  ```
+- Bit shifting example
+  ```
+  package main
+
+  import (
+    "fmt"
+  )
+
+  const // bit shifting 
+    (
+    _=iota
+    KB=1<<(10*iota)
+    MB//all of these constants will be assigned value through bit shifting
+    GB
+    TB
+    PB
+    EB
+    ZB
+    YB
+    )
+    
+  func main (){
+
+    //GO allows us to assign results of arithematic and logical calculations and bit shifting to constants at time of decleration execpt raised to power as it is a function in math package
+
+	fileSize:= 4000000000.
+	fmt.Printf("%.2fGB",fileSize/GB) // prints 3.73GB
+    //.2f means float will be displayed upto 2 decimal places
+    }
+
+  ```
+
   
   
 
