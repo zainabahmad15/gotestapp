@@ -341,6 +341,8 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
   ```
 
 ## Arrays
+- Arrays are collections of items with the same type 
+- Fixed size  
 - Initialization \
   `grades := [3]int {97, 85, 93}` // size of array, data type, values \
   `fmt.Printf("Grades: %v",grades)` // prints Grades: [97 85 93] \
@@ -369,7 +371,7 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     fmt.Println(a) // prints [1 2 3]
     fmt.Println(b) // prints [1 5 3]
   ```
-  We can use pointers, by using the address literal `&`   
+  We can use pointers, by using the "address of" literal `&`   
   ```
     a := [...] int {1, 2, 3}
     b := &a // now b is pointing to the address of a 
@@ -378,9 +380,91 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     fmt.Println(b) // prints [1 5 3]
   ```
 ## Slices
-- creation
-- built in functions
-- exercies
+- Just a projection of the underlying array - reference type 
+- Initialization
+  ```
+    a := [] int {1, 2, 3} // size is not defined
+    fmt.Println(a) // prints [1 2 3]
+    fmt.Printf("Length: %v\n" , len(a)) // prints Length: 3
+    fmt.Printf("Capacity: %v\n" , cap(a)) // prints Capacity: 3 
+    // Capacity might be much larger than the number of elements inside of an array
+  ```
+- Dont need to use pointers
+  ```
+    a := [] int {1, 2, 3}
+    b := a 
+    b[1] = 5 
+    fmt.Println(a) // prints [1 5 3]
+    fmt.Println(b) // prints [1 5 3]
+  ```
+- Slicing operations - can be used on arrays as well 
+  ```
+  // indexing starts from 0
+  // first number is inclusive index and second number is exclusive index
+  // ':' creates slices. slicing operations work with arrays too
+  a := []int{1,2,3,4,5,6,7,8,9,10}
+  b := a[:]   //slice of all elements
+  c := a[3:]  //slice from 4th element to end
+  d := a[:6]  //slice of first 6 elements
+  e := a[3:6] //slice of 4th,5th and 6th element
+  
+  fmt.Println(a) // prints [1,2,3,4,5,6,7,8,9,10] 
+  fmt.Println(b) // prints [1,2,3,4,5,6,7,8,9,10] 
+  fmt.Println(c) // prints [4,5,6,7,8,9,10] 
+  fmt.Println(d) // prints [1,2,3,4,5,6] 
+  fmt.Println(e) // prints [4,5,6] 
+
+  a[5] = 42   //since all these slices point to the same data changing a value in one slice will reflect in all the other slices
+
+  fmt.Println(a) // prints [1,2,3,4,5,42,7,8,9,10] 
+  fmt.Println(b) // prints [1,2,3,4,5,42,7,8,9,10] 
+  fmt.Println(c) // prints [4,5,42,7,8,9,10] 
+  fmt.Println(d) // prints [1,2,3,4,5,42] 
+  fmt.Println(e) // prints [4,5,42]
+  ```
+- make() function 
+  `a := make([]int,3,100)` // type, length, capacity \
+  `fmt.Printf("Length: %v\n" , len(a))`   // prints Length: 3 \
+  `fmt.Printf("Capacity: %v\n" , cap(a))` // prints Capacity: 100 
+- Unlike arrays, slices dont need to have a fixed size in their entire lifetime
+  ```
+  a := []int {} // type, length, capacity 
+  fmt.Println(a) // prints []
+  fmt.Printf("Length: %v\n" , len(a))`   // prints Length: 0
+  fmt.Printf("Capacity: %v\n" , cap(a))` // prints Capacity: 0 
+
+  a = append (a, 1) 
+  //creates a new array with larger size and then copies into it the elements of the previous array and then re-assigns it to the same pointer
+
+  fmt.Println(a) // prints [1]
+  fmt.Printf("Length: %v\n" , len(a))`   // prints Length: 1
+  fmt.Printf("Capacity: %v\n" , cap(a))` // prints Capacity: 2 
+  ```
+- Variatic function \
+  `a = append(a,2,3,4,5)` \
+  append function can take more than 2 parameters. This type of function is known as a variatric function. Everything after the the first parameter is interpreted as a value to interpret.
+	```
+    fmt.Println(a) // prints [1 2 3 4 5]
+	fmt.Printf("Length: %v\n",len(a)) // prints Length: 5
+	fmt.Printf("Capacity: %v\n",cap(a)) // prints Capacity: 8 
+    // It is not clear as to how GO resizes the array but generally if the underlying array is filled GO creates a new array with double the size 
+    ```
+- Like an array each element in a slice has to be of the same type therefore we cannot append a slice into a slice of integer regardless of the slice being appended containg integers so `a = append(a, []int{2,3,4,5})` will not work \
+  Spread operator "..." decomposes a slice into its elements so `a = append(a,[]int{2,3,4,5}...)` will work
+- Stack operations - slices can be treated as stacks
+	```
+    a := []int{1,2,3,4,5}
+	//append function allows us to push elements to the top of the stack
+	b := a[1:]    //this can also operate as shift opertor. It removes the very first element from the array
+	c := a[:len(a)-1]     // we can use this to remove last element of the array
+	d := append(a[:2],a[3:]...)   // we can use this to remove the middle element from the array
+
+	fmt.Println(b) // prints [2 3 4 5]
+	fmt.Println(c) // prints [1 2 3 4]
+	fmt.Println(d) // prints [1 2 4 5]
+    ```
+    Caution must be taken in creating multiple references to the same slice while using a command such as `d := append(a[:2],a[3:]...)` because otherwise we get strange behaviors and since we do not have any way to keep the data same we must create a copy the original slice using loops before creating a reference
+
 ## Maps
 
 ## Structs
