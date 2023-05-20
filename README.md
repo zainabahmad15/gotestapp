@@ -340,7 +340,50 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
 
   ```
 
-  
+## Arrays
+- Initialization \
+  `grades := [3]int {97, 85, 93}` // size of array, data type, values \
+  `fmt.Printf("Grades: %v",grades)` // prints Grades: [97 85 93] \
+  or `grades := [...]int {97, 85, 93}` // [...] means the size of the array should be just enough to hold the given elements in it \
+  `var students [3]string` // empty array \
+  `students [0] = "Lisa"` // a student has been added to the empty array
+- An array can be of any type but each element has to be of the same type
+- Array elements are stored in contiguous memory blocks GO sets a pointer to the first element of array and uses the index we pass to determine how many elements the pointer has to move forward
+- Length of array `len(students)`
+- Array of arrays
+  `var identitymatrix [3][3]int = [3][3]int{[3]int{1,0,0},[3]int{0,1,0},[3]int{0,0,1}}` \
+  `fmt.Printf("Identity Matrix: %v\n",identitymatrix)` \
+  or
+  ```
+  var identitymatrix [3][3]int
+  identitymatrix[0] = [3]int{1,0,0}
+  identitymatrix[1] = [3]int{0,1,0}
+  identitymatrix[2] = [3]int{0,0,1} 
+  ```
+- Arrays in Go work as values. we can declare an array as variable. 
+- When we copy an array to another variable, it poitns to another set of data 
+  ```
+    a := [...] int {1, 2, 3}
+    b := a
+    b[1] = 5 
+    fmt.Println(a) // prints [1 2 3]
+    fmt.Println(b) // prints [1 5 3]
+  ```
+  We can use pointers, by using the address literal `&`   
+  ```
+    a := [...] int {1, 2, 3}
+    b := &a // now b is pointing to the address of a 
+    b[1] = 5 
+    fmt.Println(a) // prints [1 5 3]
+    fmt.Println(b) // prints [1 5 3]
+  ```
+## Slices
+- creation
+- built in functions
+- exercies
+## Maps
+
+## Structs
   
 
 
