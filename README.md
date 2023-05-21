@@ -863,8 +863,94 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
             fmt.Println("another type")
 	}
   ```
-## Loops
+## Loops - for loops
+- simple loops
+  ```
+    for i := 0; i < 5; i ++ { // inilializer, statement that generates a bool, incrementer 
 
+    // i ++ or i = i +2 , we can have any sort of incrementers
+        fmt.Println(i)
+    }
 
+    // method to have multiple incrementers in the same for statement
+    for i,j:=0,0 ; i<5 ; i,j=i+1,j+2 {
+		fmt.Println(i,j)
+	}
+  ```
+  Playing with the incrementer - but better to avoid it 
+  ```
+    	for i:=0; i<5; i++ {
+    		fmt.Println(i)
+    		if i%2 == 0{
+    			i/=2
+    		}else{
+    			i = 2*i + 1
+    		}
+    	}
+  ```
+- We can miss out statements in the for statement but we cannot miss out the `;` because Go uses it to check position \
+  We can miss out the `;` if we are missing out two statements. for i<5 is same as for;i<5; \
+    `i := 0` this `i` is scoped to the main function but if we include it in the for statement then i will be scoped to the for loop
+    ```
+    i := 0
+    for ;i<5; {
+		fmt.Println(i)
+		i++
+	}
+    ```
+- while and do while in Go
+  - Go does not have while and do while keywords
+  - we can imitate their behavior by removing increment statement from for statement and include it in loop body
+  ```
+    // while loop
+    i := 0
+	for i < 5 {
+		fmt.Println(i)
+		i++
+	}
+
+    // do while loop 
+    i := 0
+    for i < 5 {
+        if i==5{
+			break
+		}
+		i++
+    } 
+
+    for i:=0;i<10;i++{
+		if i%2 == 0{
+			continue //continue keyword is used to skip the current iteration
+		}
+		fmt.Println(i)
+	}
+  ```
+- Nested loops
+  ```
+    Loop: //label helps to specify a point in code where we want to break out to
+	for i:=1;i<=3;i++{
+    		for j:=1;j<=3;j++{
+    			fmt.Println(i*j)
+    			if i*j>=3{
+                    // break // breaks out of the closest loop 
+    				break Loop //this takes us to the point where hte label is 
+    			}
+    		}
+    	}
+  ```
+- loop through collections - using a for range loop
+  ```
+    s:= []int{1,2,3} // slice
+    fmt.Println(s)  // prints [1 2 3]
+
+ 	for k,v:=range s{   // key, value := range over the collection
+        fmt.Println(k, v) // prints indices and values at each index
+	}
+  ```
+  - for range loop is used to traverse collections
+  - In case of maps it gives us the actual key value pair
+  - range keyword can be used with arrays,maps,string and channels
+  - if we want to ignore key then we can use the write only keyword which is simply a `_` so we print by using `for _,v:=range mapName` and then `fmt.Println(v)`
+  - if we want to ignore the value then we can simply remove it from the for range statement
 
 
