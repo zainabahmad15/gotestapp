@@ -612,7 +612,7 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     fmt.Println(aDoctor)        // prints Tom
     fmt.Println(anotherDoctor)  // prints Tom
   ```
-- Embedding \
+- Embedding
   - Go does not support the traditional rules of OOP for example it does not have inheritance \
   - Instead Go has a model similar to inheritance called composition through embedding 
     ```
@@ -680,7 +680,124 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
         fmt.Println(field.Tag) // Tag function simply returns a string of Tags. It is for the validation function to see what to do with the Tags 
     }
   ```
-  
+
+## Control Flow - if statements
+- if statement
+  ```
+    package main
+
+    import (
+        "fmt"
+    )
+
+    func main() {
+    	if true {
+            //{} are necessary even in case of one statement 
+    		fmt.Println("The test is True!")
+    	}
+    }
+  ```
+- Initializer syntax
+  ```
+    statePopulation := map[string]int{
+        "california":39250017,
+        "Texas":27862596,
+        "Florida":20612039,
+        "New York":19745289,
+        "Pennsylvania":12802503,
+        "Illinois":12801539,
+        "Ohio":11614373,
+	}
+	
+	if pop,ok := statePopulation["Florida"]; ok {
+    		fmt.Println(pop)
+    }
+
+    fmt.Println(pop) // prints undefined
+  ```
+  The statement before the `;` is the initializer statement which uses a function call to generate a boolean result and store it in a variable `ok` \
+  The variable `ok` is typed after the `;` and if statement runs on basis of the value stored in `ok` \
+  `pop` and `ok` variables are locked to the scope of if statement i.e. they are inaccessible outside the scope of if statement
+- Comparison operators
+    ```
+        number := 50
+        guess := 70
+
+        if guess < number{
+            fmt.Println("too low!")
+        }
+        if guess > number{
+            fmt.Println("too high!")
+        }
+        if guess == number{
+            fmt.Println("You got it!")
+        }
+
+        fmt.Println(number<=guess,number>=guess,number!=guess) // true false true 
+        // these only workfor int types, not string types
+
+        // string type works with == or !=  
+    ```
+
+    ```
+        if guess < 1{
+    		fmt.Println("guess should be greater than or equal to 1")
+    	}else if guess > 100{
+    		fmt.Println("guess should be less than or equal to 100")
+    	}else{
+            if guess < number{
+                fmt.Println("too low!")
+            }
+            if guess > number{
+                fmt.Println("too high!")
+            }
+            if guess == number{
+                fmt.Println("You got it!")
+            }
+    	}
+        
+        fmt.Println(!true) // prints false
+    ```
+    the `else` and `else if` statement should be written in the same line as the ending brace of the previous `if` or `else if` statement
+- Short circuiting
+    ```
+        if guess<1 || guess>100{
+            fmt.Println("Guess should be between 1 and 100")
+        }
+    ```
+    In case of multiple OR, go checks the boolean value returned by each statement in order they are written. If the first statement returns true then the remaining conditions are ignored since end result will always be true. This is called shortcicuiting in Go. 
+
+- equality operators
+    ```
+        import (
+            "fmt"
+            "math"
+        )
+
+        func main() {
+
+            myNum := 0.1234567
+            if myNum == math.Pow(math.Sqrt(myNum),2) {
+                fmt.Println("These are same!")
+            }else{
+                fmt.Println("These are different!")
+            }
+
+            // Go uses floating points to represent decimal values which are an approximation of the original values therefore when Go calculates the square root and then calculates exponent of the value the new value turn out to be different. Better approach is to introduce an error and check if the error is less than a certain threshold, so 
+
+            myNum := 0.1234567
+            if math.Abs(myNum / math.Pow(math.Sqrt(myNum),2)-1) < 0.001 {
+                fmt.Println("These are same!")
+            }else{
+                fmt.Println("These are different!")
+            }
+        }
+    ```
+## Control Flow - switch statements
+- simple cases
+- multiple tests
+- falling through
+- type switches
 
 
 
