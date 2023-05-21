@@ -466,7 +466,7 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     Caution must be taken in creating multiple references to the same slice while using a command such as `d := append(a[:2],a[3:]...)` because otherwise we get strange behaviors and since we do not have any way to keep the data same we must create a copy the original slice using loops before creating a reference
 
 ## Maps
-- Declare usign the map literal \
+- Declare using the map literal \
   `mapName := map[string]int `// map[type of key] type of value 
     ``` 
     package main
@@ -539,10 +539,148 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     // ohio is deleted from both
   ```
 ## Struct
+- Structure is also a collection type - it gathers similar info together. \
+  It doesnt need to have the same type of data 
 - Creation
+  ```
+    package main 
+
+    import (
+        "fmt"
+    )
+
+    type Doctor struct {
+        number int
+    	actorname string
+    	episodes []string
+        companions []string
+    }
+
+    func main(){
+        aDoctor := Doctor {
+            number : 3,
+            actorName: "Jon",
+            companions: []string{
+                "liz" ,
+                "jo", 
+                "sarah"
+            }
+        }
+        fmt.Println(aDoctor) 
+        // prints { 3 Jon [liz jo sarah]}
+    }
+  ```
+- Dot syntax - to get one value from a struct 
+  `fmt.Println(aDoctor.name)` // prints Jon
+- Positional syntax to instantiate a struct
+  ```
+  aDoctor := Doctor {
+            3,
+            "Jon",
+            []string{
+                "liz" ,
+                "jo", 
+                "sarah"
+            }
+        }
+  ```
+  but not recommended, because it can become a maintenance problem. In case of any changes to struct body Go will not map the values to fields properly so we will be required to add a placeholder every time
 - Naming conventions
-- Embedding
-- Tags
+  same rules apply to struct when declaring as other variables \
+  - If first letter is Capital then the struct will be exported outside of the package \
+  - If the field names start with a capital letter only then will the other packages be able to see the fields of the struct that is being exported \
+  - Go does not allow _ to be in the name of struct and the field names
+- Anonymous struct
+  ```
+    func main(){
+        aDoctor := struct {name string} {name : "Jon"} // structure of struct ,initializer which provides data into the struct
+    }
+  ```
+  rarely used 
+- Structs are value types \
+  we can assign a struct to another struct, but maniplation will only be done in the new one, since it is value type 
+  ```
+    anotherDoctor := aDoctor
+    anotherDoctor.name = "Tom"
+    fmt.Println(aDoctor)        // prints Jon
+    fmt.Println(anotherDoctor)  // prints Tom
+  ```
+  but we can create pointer to struct using  `&`
+  ```
+    anotherDoctor := aDoctor
+    anotherDoctor.name = "Tom"
+    fmt.Println(aDoctor)        // prints Tom
+    fmt.Println(anotherDoctor)  // prints Tom
+  ```
+- Embedding \
+  - Go does not support the traditional rules of OOP for example it does not have inheritance \
+  - Instead Go has a model similar to inheritance called composition through embedding 
+    ```
+        type Animal struct{
+            Name string 
+            Origin string
+        }
+
+        type Bird struct{
+            Animal // embedding animal struct in bird struct
+            SpeedKPH float32
+            CanFly bool
+        }
+
+        func main(){
+            //
+            b := Bird{}
+
+            b.Name = "Emu"
+            b.Origin = "Australia"
+            b.SpeedKPH = 48
+            b.CanFly = false
+            fmt.Println(b) // prints {{Emu Australia} 48 false}
+            fmt.Println(b.Name) // prints Emu
+        }
+    ```
+  - We can access the fields of an embedded struct the same way we access the fields of a normal struct that is by using . notation
+  - Composition does not work like inheritance i.e. Bird is not type Animal so they cannot be used interchangeably. Bird is an independant struct. Bird has Animal like characteristics only
+  - To allow interchangeable usage we use interfaces
+  - To use literal syntax
+    ```
+        b := Bird{
+            Animal : Animal{Name:"Emu",Origin:"Austrailia"},
+
+            //incase of literal syntax, we need to have some knowledge of the internal structure of the struct that has embedding. We have to explicitly initialize the embedded struct
+
+            SpeedKPH : 48,
+            CanFly : false,
+        }
+        fmt.Println(b.Name)  // prints 
+    ```
+  - Embedding is a not a good choice for modelling behaviors for that we use interfaces but to provide accessibility to custom structs we use embedding
+- Tags \
+  Tagging is a concept used when we have to define some specific rules for a field inside of a struct \
+  Space delimited subtags are used
+
+  ```
+    package main
+
+    import (
+        "fmt"
+        "reflect"
+         // we have to use reflect package to get tags which have been attached to a field
+    )
+
+    type Animal struct {
+        Name string `required max:"100" ` 
+        // so the name field is required and is not more than 100 char
+        Origin string
+    }
+
+    func main(){
+        t := reflect.TypeOf(Animal{})  // type of an object 
+        field, _ := t.FeildByName("Name") // FieldByName function returns a field 
+        fmt.Println(field.Tag) // Tag function simply returns a string of Tags. It is for the validation function to see what to do with the Tags 
+    }
+  ```
+  
 
 
 
