@@ -1081,7 +1081,108 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     done panicking is not printed because the panicker() func stops after the panic
     so another panic is thrown 
     ```
+## Pointers
+- Creating pointers
+  ```
+  package main
+  import "fmt"
+  func main(){
+    a := 42 // value type
+    b := a  // copies data of a and assigns it to b
+    fmt.Println(a) // prints 42
+    fmt.Println(b) // prints 42
+
+    a = 27
+    fmt.Println(a) // prints 27
+    fmt.Println(b) // prints 42 - because only a changed
+
+    // we can make b point to a 
+    var a int = 42 
+	var b *int = &a // variable b is a pointer to an integer - points to the address of a 
+    //b is a pointer which points to a. b now holds the address of a
+
+    fmt.Println(a,b)   // prints 42 0x123453
+	fmt.Println(&a,b)  // prints 0x123453 0x123453
+
+	a = 27
+	fmt.Println(a,*b)  // 27 27 
+    //*b is the syntax to dereference the pointer. This will give you the value stored in the address, same as simply typing a 
+
+    *b = 14 
+    fmt.Println(a,*b)  // 14 14 
+  }
+  ```
+- Pointer arithmetic deosnt work in Go
+  ```
+    a := [3]int{1,2,3}
+	b := &a[0] //b points to first index of a
+	c := &a[1] //c points to second index of a
     
+    //Go does not allow pointer arithematic as it was left out from the design of Go to allow simplicity but if we absolutely need such functionality then we can import the unsafe package   
+    // c := &a[1]-4 // not possible to get address of b 
+
+	fmt.Printf("%v %p %p\n", a, b, c)  // prints [1 2 3] 0x1040a124 0x1040a128 
+    // %p prints the address stored in a pointer
+    // the addresses are two indices apart as int is 4bytes long 
+  ```
+  if you absolutely need such functionality then we can import the unsafe package
+- You don't neccessarily have to explicitly define the variable with underlying data type
+  ```
+    var ms *myStruct
+	ms = &myStruct{foo:42} 
+	fmt.Println(ms) // prints &{42} - ms is holding the address of an object which has value 42
+    //this shows that ms holds the address of a struct which has a field with the value 42
+
+    type myStruct struct {
+        foo int 
+    }
+  ```
+- The new function
+  ```
+    var ms *myStruct
+	ms = new(myStruct)  
+    // ms is holding nil - since every newly created variable holds an initial value
+	//new keyword creates an object and outputs its address. We cannot use object initializer syntax with new keyword
+
+    fmt.Println(ms)     // prints &{0} 
+
+    type myStruct struct {
+        foo int 
+    }
+
+
+
+    // (*ms).foo = 42 
+    // // dereference operator has a lower precedence than the dot operator therefore we use () around the dereference operator 
 	
+    // fmt.Println((*ms).foo) // prints 42
+
+    ms.foo = 27
+    //Due to simplicity and limitations on pointers in Go the compiler reads ms.foo the same as (*ms).foo even though the pointer itself does not a have field named foo.
+
+    fmt.Println(ms.foo) // prints 42 
+  ```
+- handling variables 
+  ```
+    a := [3]int{1,2,3}  
+    b := a 
+    fmt.Println(a,b) // prints [1 2 3]  [1 2 3]
+    a[1]=42  
+    fmt.Println(a,b) // prints [1 42 3] [1 2 3] because b is just a copy of data of a  
+
+    //but slices give a pointer to the first value with which a slice starts 
+    a := []int{1,2,3}  
+    b := a 
+    fmt.Println(a,b) // prints [1 2 3]  [1 2 3]
+    a[1]=42  
+    fmt.Println(a,b) // prints [1 42 3] [1 42 3] 
+
+    //same with maps
+    a := map[string]string{"foo":"bar","baz":"buz"}
+	b := a 
+	fmt.Println(a,b) // prints map[foo:bar baz:buz] map[foo:bar baz:buz]
+	a["foo"] = "qux"
+	fmt.Println(a,b) // prints map[foo:quz baz:buz] map[foo:quz baz:buz]
+  ```
  
 
