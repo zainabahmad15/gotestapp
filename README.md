@@ -101,7 +101,7 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     }
     ```
 
-## Primitives data types 
+## Primitive data types 
 - Boolean
   - Two states : true/false
   - Flags \
@@ -794,10 +794,77 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
         }
     ```
 ## Control Flow - switch statements
-- simple cases
-- multiple tests
-- falling through
+- switch statement is just a special purpose if statement
+- simple case
+  ```
+    switch 2 {  // 2 is a tag here, we will compare everything with this tag
+        case 1: // 1 will be compared with the tag 2 - if it is true, then this case executes
+                fmt.Println("one")
+        case 2:
+                fmt.Println("two")
+        default: // executes when no other test case passes
+                fmt.Println("not one or two")
+    }
+  ```
+- Multiple tests in a single case \
+  - In other languages we can add multiple cases and use the concept of falling through
+  - In Go falling through is not the default behavior but we can have multiple tests in a single case statement
+  - We can also use initializer syntax with switch case statements
+  - We can't have overlapping test cases because this is a syntax error
+  ```
+    // initializer syntax 
+    switch i:=2+3; i{  
+        case 1,5,10: 
+                fmt.Println("one, five or ten")
+        case 2,4,6:
+                fmt.Println("two, four or six")
+        default:
+                fmt.Println("another number")
+    }
+
+    // tagless syntax
+    i := 10
+	switch {
+	case i <= 10: // comparison operations or logical operations can be used here
+		fmt.Println("less than or equal to 10") 
+	case i<= 20:
+		fmt.Println("less than or equal to 20")
+	default:
+		fmt.Println("greater than 20")
+	}
+
+    // In this situation, test cases can overlap, first truw case executes
+    // no need for curly braces
+    // In Go, switch case statements have an implicit break between cases 
+    // fallthrough keyword allows the next case block to trigger - regardless of a false next case
+
+    case i <= 10: // comparison operations or logical operations can be used here
+		fmt.Println("less than or equal to 10") 
+        fallthrough
+	case i<= 20:
+		fmt.Println("less than or equal to 20")
+
+    // both messages will be printed out 
+  ```
 - type switches
+  ```
+    var i interface{} = 1 // type interface can take any type in a Go application
+	switch i.(type){ //i.(type) function pulls out the actual type of data
+        case int:
+            fmt.Println("i is an int")
+            break
+            //break keyword can be used to prevent usage of some instructions
+            fmt.Println("this prints too")  // then this wont print because statement would break
+        case float64:
+            fmt.Println("i is a float")
+        case string:
+            fmt.Println("i is a string")
+        default:
+            fmt.Println("another type")
+	}
+  ```
+## Loops
+
 
 
 
