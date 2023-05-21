@@ -938,19 +938,150 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     		}
     	}
   ```
-- loop through collections - using a for range loop
-  ```
-    s:= []int{1,2,3} // slice
-    fmt.Println(s)  // prints [1 2 3]
+- loop through collections, using a for range loop
+    ```
+        s:= []int{1,2,3} // slice
+        fmt.Println(s)  // prints [1 2 3]
 
- 	for k,v:=range s{   // key, value := range over the collection
-        fmt.Println(k, v) // prints indices and values at each index
-	}
-  ```
+        for k,v:=range s{   // key, value := range over the collection
+            fmt.Println(k, v) // prints indices and values at each index
+        }
+    ```
   - for range loop is used to traverse collections
   - In case of maps it gives us the actual key value pair
   - range keyword can be used with arrays,maps,string and channels
   - if we want to ignore key then we can use the write only keyword which is simply a `_` so we print by using `for _,v:=range mapName` and then `fmt.Println(v)`
   - if we want to ignore the value then we can simply remove it from the for range statement
+## Control Flow - Defer, Panic, Recover 
+- In a normal Go program the control flow is from top to the bottom of whatever function we call 
+- We can alter that logic by branching and loops to repeat certain blocks
+- but generally a functions runs from top to bottom
+    ```
+    fmt.Println("Start")
+	defer fmt.Println("Middle")
+	fmt.Println("End")
 
+    // prints 
+    // start end middle
+    ```
+    so a defer keyword runs a function after everything else has finished running, but before a function returns \
+    deferred instructions execute in LIFO order. This means that the last last deffered function will run first
+    ```
+    defer fmt.Println("Start")
+	defer fmt.Println("Middle")
+	defer fmt.Println("End")
+
+    // prints 
+    // end middle start 
+    ```
+    defer only records the value that was passed before the statement was deffered
+    ```
+        a := "start"
+	    defer fmt.Println(a) 
+        //start is printed because it was passed to a before the statement was deffered
+
+	    a = "end"
+    ```
+- We do not have exceptions in Go because alot of things that are considered exceptions in other languages are considered normal in Go 
+- However, there are cases when a Go program simply cannot proceed. Such cases are described using the word panic in Go instead of the word exception
+  ```
+    a,b := 1,0 
+	ans:= a/b   // invalid answer 
+	
+    fmt.Println(ans)
+    //in cases where Go cannot evaluate an answer, Go itself throws a panic,shows the runtime error and a stack trace to let us know where the error occured
+  ```
+- If our Go program runs into a state where it cannot continue to execute, then you panic aswee, so then we can stop execution using panic keyword
+  ```
+    fmt.Println("start")
+	panic("Something went wrong")
+
+    //Go throws a panic when it reaches this line. Shows the statement that we have passed to it. Behaves similar to try catch block
+
+	fmt.Println("end")
+  ```
+- a more practical example
+    ```
+    package main 
+
+    import (
+        "net/http"
+    )
+
+    func main(){
+        // function listener , with a callback 
+        http.HandleFunc("/" , func(w http.ResponseWrite, r *http.Request) { 
+            w.Write([]byte("Hello Go!"))
+        })
+        err := http.ListenAndServe(":8080", nil)
+        if err != nil {
+            panic (err.Error())
+        }
+
+        //Go rarely has an opinion if an error has to be panicked over or not therefore it is onto us as a developer to see if the program should panic and stop execution 
+    }
+    ```
+- Panics aren't fatal as long as the program itself does not run into a panicking situation and is unaware of what to do with it and so decides to stop execution
+- panics occur when program cannot continue at all 
+- if nothing handles the panic, program exits
+- Deferred statements are going to succeed in execution even if our program is panicking. This is to release resources
+- Panics happen after deferred statement is run. First normal statements are run, then deferred statements are run, then panic statements are run and at last any value is returned
+    ```
+        fmt.Println("start")
+        defer fmt.Println("this was deferred")
+        panic("something bad happend")
+        fmt.Println("end")
+    ```
+- defer keyword does not take a function itself it takes a function call
+	```
+    fmt.Println("start")
+	defer func(){
+    
+    //syntax for anonymous function. An anonymous function does not have a name so it cannot be called like a regular function and it is triggered at one point only once
+
+	if err:=recover(); err!=nil {
+
+        // recover() function return nil if the program isn't panicking but returns the actual statement in case of panicking.recover() function is useful when stack is deeper 
+
+        log.Println("Error:",err) // this prints the panic statement where we explicitly panicked the program
+        }
+	}()  //these parenthesis execute the anonymous function
+	panic("something bad happend")
+	fmt.Println("end")
+    ```
+- panic and defer are limited to the function in which they are used. The functions that are higher in the call stack work normally \
+  using recover() suggests that we will take care of the panic and it allows us to recover from a known panic. It is only useful in deferred functions because when an application panics it will no longer execute that function but will still execute deferred functions
+    ```
+    func main(){
+        fmt.Println("start")  
+        panicker()
+        fmt.Println("end")
+    }
+    func panicker(){
+        fmt.Println("about to panic")
+        defer func(){
+            if err:=recover();err!=nil{
+                log.Println("Error:",err)
+                
+                //incase an error occurs which we can't deal with then re-panic the application. This panics the main function aswell. This is because this panic remains unhandled due to which it goes up the call stack in Go runtime. Go runtime has no builtin handler for this type of panic
+                
+                panic(err)
+            }
+        }()
+        panic("something bad happen")
+        fmt.Println("done panicking")
+    }
+
+
+    // in this program we get the output as:
+    start 
+    about to panic
+    deferred statement runs - function panics
+    then recovers from panic 
+    done panicking is not printed because the panicker() func stops after the panic
+    so another panic is thrown 
+    ```
+    
+	
+ 
 
