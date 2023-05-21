@@ -1156,8 +1156,8 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     // // dereference operator has a lower precedence than the dot operator therefore we use () around the dereference operator 
 	
     // fmt.Println((*ms).foo) // prints 42
-
-    ms.foo = 27
+ 
+    ms.foo = 27   // complex types such as structs are automatically dereferenced
     //Due to simplicity and limitations on pointers in Go the compiler reads ms.foo the same as (*ms).foo even though the pointer itself does not a have field named foo.
 
     fmt.Println(ms.foo) // prints 42 
