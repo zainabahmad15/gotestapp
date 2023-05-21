@@ -466,9 +466,83 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     Caution must be taken in creating multiple references to the same slice while using a command such as `d := append(a[:2],a[3:]...)` because otherwise we get strange behaviors and since we do not have any way to keep the data same we must create a copy the original slice using loops before creating a reference
 
 ## Maps
+- Declare usign the map literal \
+  `mapName := map[string]int `// map[type of key] type of value 
+    ``` 
+    package main
 
-## Structs
-  
+    import (
+        "fmt"
+    )
+
+    func main() {
+        statePopulation := map[string]int{
+        // this syntax suggests that every key is of string type and every value is of int type
+
+        // type should be consistant for every key-value pair in a map
+        
+        "California":39250017,
+        "Texas":27862596,
+        "Florida":20612039,
+        "New York":19745289,
+        "Pennsylvania":12802503,
+        "Illinois":12801539,
+        "Ohio":11614373,
+        }
+
+        fmt.Println(statePopulation)
+    }
+   ```
+- Slices cannot be keys to a map \
+  `m := map[[]int]string` // invalid \
+  but arrays can be keys to a map \
+  `m := map[[...]int]string`
+- Using the make() function  
+  ```
+  mapName := make(map[string]int) 
+  statePopulation = map[string]int{
+       "California":39250017,
+       "Texas":27862596,
+       }
+  ```
+- Manipulation of values in a map \
+  Get one value from a map using [] \
+  `fmt.Println(statePopulation["Ohio"])` // prints 11614373 \
+  Add one value to a map \
+  `statePopulation["Georgia"] = 10310371` \
+  `fmt.Println(statePopulation["Georgia"])` // prints 10310371 \
+- Return order of a map is not guaranteed
+- Delete entries from a map using builtin delete function : `delete(mapName, "key")` \
+  `delete(statePopulation, "Georgia")`
+- When returnung a value, if we mispell a key or enter a deleted key then the returned value will always be 0
+- Use the ,ok syntax to see if a key exists in the map \
+  ok returns false if key does not exist otherwise it returns true \
+  ok is not a keyword but it is a convention to not use ok for variable name
+  ```
+    population, ok:= statePopulation["Georgia"]
+    fmt.Println(population,ok) // prints 0 false
+
+    //to just check for presence we can use the following syntax
+    //_, ok = statePopulation["Ohio"]
+    fmt.Println(ok) // prints true
+  ```
+- Find out the number of keys inside of map using len function \
+`fmt.Println(len(statePopulation))`
+- Maps are passed by reference \
+  if we initialize a variable with another map variable then both variables will point to the same map. It also applies to when passing maps to a function
+  ```
+    sp := statePopulation
+    delete (sp, "Ohio")
+    fmt.Println(sp)
+    fmt.Println(statePopulation)
+
+    // ohio is deleted from both
+  ```
+## Struct
+- Creation
+- Naming conventions
+- Embedding
+- Tags
 
 
 
