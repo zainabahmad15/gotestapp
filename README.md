@@ -1184,5 +1184,275 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
 	a["foo"] = "qux"
 	fmt.Println(a,b) // prints map[foo:quz baz:buz] map[foo:quz baz:buz]
   ```
- 
+ ## Functions
+ -  Syntax
+  ```
+    package main // entry point in the application
+
+    import (
+        "fmt"
+    )
+
+    func main() {
+        fmt.Println("Hellow world")
+    }
+  ```
+  - they start with `func` keyword
+  - name of function : uppercase first letter - public, lowercase first letter - internal to the package
+  - `()` are to be used even if there are no parameters
+  - `{}` Go enforces the opening brace `{` to be in the same line as the func keyword, closing `}` can be on its own 
+ -  parameters
+    ```
+        package main 
+        import (
+            "fmt"
+        )
+
+        func main() {
+            sayMessage("Hello world") 
+        }
+
+        func sayMessage(msg string){
+            fmt.Println(msg)
+        }
+    ```
+    we can also have multiple parameters to a function
+    ```
+        package main 
+        import (
+            "fmt"
+        )
+
+        func main() {
+            for i :=0;i<5;i++{
+            sayMessage("Hello world!",i)
+            }
+        }
+
+    func sayMessage(msg string, idx int){ // two parameters
+        fmt.Println(msg)
+        fmt.Println("index: " , idx)
+    }
+
+    ```
+    if we have to give the same type of arguments in a function, we can use a comma delimited list of variables and the type at the end \
+    `sayGreeting(greeting, name string)` instead of `sayGreeting(greeting string, name string)`
+- using pointers 
+    ```
+    package main 
+    import (
+        "fmt"
+    )
+
+    func main() {
+        greeting := "Hello"
+        name := "Stacey"
+        sayGreeting(&greeting, &name) // passing address to the variables
+        fmt.Println(name) // prints Ted
+    }
+
+    func sayGreeting(greeting, name *string){   // receiving pointers, which are the values in the addresses passed from main
+
+        fmt.Println(*greeting, *name)  // prining the values
+        *name = "Ted"  // changing the value of the pointer
+        fmt.Println(name) //prints Ted because value has changed in memory 
+    }
+    ```
+    passByreference is more convenient when passing large data structures, care needs to be taken since value can be changed \
+    slices and maps will always be passed by reference as they have internal pointers to the underlying data
+- variatic parameters
+    ```
+    package main 
+    import (
+        "fmt"
+    )
+
+    func main() {
+        sum(1, 2, 3, 4, 5)
+    }
+
+    func sum(values ...int) {  // receiving only 1 variable, not 5, ... dots tell that take all the parameters passes and make a slice of it 
+        fmt.Println(values)
+        resumt := 0
+        for _, v := range values {
+            result += v
+        }
+        fmt.Println ("The sum is ", result)
+    }
+    ```
+    we can only have one variatic parameter, and it has to be at the end of the parameters 
+ -  return values
+    ```
+    package main 
+    import (
+        "fmt"
+    )
+
+    func main() {
+        s := sum(1, 2, 3, 4, 5) // declaring a variable to get the return value of the function 
+        fmt.Println ("The sum is ", s)
+    }
+
+    func sum(values ...int) int {  // return value type is after the parameter list
+        fmt.Println(values)
+        result := 0
+        for _, v := range values {
+            result += v
+        }
+        return result
+    }
+    ``` 
+-  return a local variable as a pointer
+    ```
+    package main 
+    import (
+        "fmt"
+    )
+
+    func main() {
+        s := sum(1, 2, 3, 4, 5) 
+        fmt.Println ("The sum is ", *s)
+    }
+
+    func sum(values ...int) *int {  // return pointer to an integer
+        fmt.Println(values)
+        result := 0
+        for _, v := range values {
+            result += v
+        }
+        return &result // return address of the result
+        // when Go reliase sthat you are returning a pointer, Go will transfer the value to the shared heap, form the local stack which gets destroyed after a fucntion is executed
+    }
+    ``` 
+-  named return values
+    ```
+    package main 
+    import (
+        "fmt"
+    )
+
+    func main() {
+        s := sum(1, 2, 3, 4, 5) 
+        fmt.Println ("The sum is ", s)
+    }
+
+    func sum(values ...int)  result int {  // result is the return value
+        fmt.Println(values)
+        result := 0
+        for _, v := range values {
+            result += v
+        }
+        return
+    }
+    ``` 
+    can be a bit diffcut to read \
+    more confusing for long functions
+-  multiple return values
+    ```
+    package main 
+    import (
+        "fmt"
+    )
+
+    func main() {
+        // 0.0 will give infinity 
+        d, err := divide (5.0, 0.0) 
+
+        if err != nil {
+            fmt.Println(err)
+            return
+        } 
+        fmt.Println (d)
+    }
+
+    func divide(a, b float64) (float64, error) {
+        
+        // // we can panic the program, but this isnt recommended because program would stop
+        //if b == 0.0 {
+        //    panic ("Cannot provide zero as value")
+        //}
+
+        // instead we will return an error 
+        // guard to check for error condition
+        if b == 0.0 {
+            return 0.0, fmt.Errorf("cannot divide by zero")
+        }
+
+        return a / b , nil //nil because no error was present in the simple case 
+    }
+    ``` 
+ -  anonymous functions
+    ```
+    package main 
+    import (
+        "fmt"
+    )
+
+    func main() {
+        func () {
+            fmt.Println ("Hello")
+        } () // brackets are invoking the function  
+
+        for i:=0;i<5;i++{
+        func(int i) {//parameter decleration
+                fmt.Println(i) 
+                
+                // we can access i in this function as inner scopes have access to variables of outer scopes. This makes problems if our function is running asynchronously therefore we pass the value as a parameter to the function
+
+            }(i) // can be used to pass values to the function
+        } 
+    }
+    ```
+- functions as variables 
+  ```
+    var f func() = func(){ //this syntax allows us to store an anonymous function in a variable 
+		fmt.Println("Hello Go!")
+	}
+	f() // invoking the anonymous function
+  ```
+  function as varibale taking parameters \
+  storing a parameterized anonymous function inside of a variable. We have to explicitly mention the data types of each parameter, in order. This is called a type signature 
+  ```
+    var divide func(float64,float64)(float64,error) 
+    divide = func(a,b float64) (float64,error) { 
+		if b==0.0{
+			return 0.0,fmt.Errorf("Cannot divide by zero")
+		}else{
+		    return a/b, nil
+		}
+	}
+	
+	d,err := divide(5.0,3.0) // the difference between this and an explicitly defined function is that it cannot be called at any time before the function was defined 
+
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(d)
+  ```
+ -  methods
+  ```
+    func main(){
+        g := greeter { 
+            greeter :"Hello",
+            name : "Go"
+        }
+        g.greet() // 
+    }
+
+    type greeter struct {  // struct 
+        greeting string    // fields
+        name string
+    }
+
+    // now this is a method 
+    func (g greeter) greet() { // value receiver 
+        fmt.Println(g.greeting, g.name)
+    }
+  ```
+  A method is a function which is executing in a known context \
+  A known context is any type \
+  When a method is invoked it gets a copy of the greeter object and the object provides the method context 
+
+  ## Interfaces 
 
