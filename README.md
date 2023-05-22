@@ -1260,7 +1260,7 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
     ```
     passByreference is more convenient when passing large data structures, care needs to be taken since value can be changed \
     slices and maps will always be passed by reference as they have internal pointers to the underlying data
-- variatic parameters
+- variadic parameters
     ```
     package main 
     import (
@@ -1280,7 +1280,7 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
         fmt.Println ("The sum is ", result)
     }
     ```
-    we can only have one variatic parameter, and it has to be at the end of the parameters 
+    we can only have one variadic parameter, and it has to be at the end of the parameters 
  -  return values
     ```
     package main 
@@ -1410,7 +1410,7 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
 	}
 	f() // invoking the anonymous function
   ```
-  function as varibale taking parameters \
+  function as variable taking parameters \
   storing a parameterized anonymous function inside of a variable. We have to explicitly mention the data types of each parameter, in order. This is called a type signature 
   ```
     var divide func(float64,float64)(float64,error) 
