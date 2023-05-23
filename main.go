@@ -2,14 +2,21 @@ package main // add packages, main is the starting point
 
 import (
 	"fmt"
-	"runtime"
-	//"sync"
-	//"time"
 )
+
+//"sync"
+//"time"
 
 // "io"
 // "log"
 //"net/http"
+
+func main() {
+	var msg string = "Hello"
+	fmt.Printf("%v", msg)
+	// prints 9
+	// shadowing by inner most scope
+}
 
 // // defer
 // func main() {
@@ -123,42 +130,34 @@ import (
 // 	wg.Done()
 // }
 
-// there is no synchronization between the go routines, so to do that we have mutex
-// which is a lock that the application is going to honor
-var wg = sync.WaitGroup{} // safe to use globally 
-var counter = 0
-var m = sync.RWMutex{} // read write mutex - lock unclock so one thing can access data at one time
-// RW , infinite reader, only one writer 
-func main() {
-	runtime.GOMAXPROCS(100) 
-	for i := 0; i < 10; i++ {
-		wg.Add(2)
-		// lock the mutex in a single context, and then asyncronously in the separate routines
-		m.RLock() // read lock 
-		go sayHello()
-		m.Lock() // write lock 
-		go increment()
-	}
-	wg.Wait()
-}
+// // there is no synchronization between the go routines, so to do that we have mutex
+// // which is a lock that the application is going to honor
+// var wg = sync.WaitGroup{} // safe to use globally
+// var counter = 0
+// var m = sync.RWMutex{} // read write mutex - lock unclock so one thing can access data at one time
+// // RW , infinite reader, only one writer
+// func main() {
+// 	runtime.GOMAXPROCS(100)
+// 	for i := 0; i < 10; i++ {
+// 		wg.Add(2)
+// 		// lock the mutex in a single context, and then asyncronously in the separate routines
+// 		m.RLock() // read lock
+// 		go sayHello()
+// 		m.Lock() // write lock
+// 		go increment()
+// 	}
+// 	wg.Wait()
+// }
 
-func sayHello() {
-	fmt.Printf("Hello #%v\n", counter) // print message 
-	m.RUnlock()
-	wg.Done()
-}
+// func sayHello() {
+// 	fmt.Printf("Hello #%v\n", counter) // print message
+// 	m.RUnlock()
+// 	wg.Done()
+// }
 
-func increment() {
-	counter++
-	m.Unlock() // write unlock 
-	wg.Done() 
-}
-// but this is destroying the parallelism 
-
-
-
-
-
-
-
-
+// func increment() {
+// 	counter++
+// 	m.Unlock() // write unlock
+// 	wg.Done()
+// }
+// // but this is destroying the parallelism

@@ -1654,7 +1654,7 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
   - design functions and methods to receive interfaces whenever possible
 
 ## Goroutines
-- Creating goroutines - go to main.go file \
+- Creating goroutines - go to `main.go` file \
   goroutines are high level threads - basically a lightweight abstraction over a thread \
 - Synchronization 
 - WaitGroups
@@ -1691,4 +1691,172 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
   - when creating a goroutine, know when it will end
   - check for race conditions at compile time `go run -race main.go` 
 
-## Chanells
+## Channels
+- Basics \
+  used in the context of goroutines
+    ```
+    var wg = sync.WaitGroup{}
+
+    func main(){
+        ch := make(chan int)  // make keyword, chan keyword, channel type 
+        // we can only send ints through this channel
+
+        wg.Add(2) // 2 goroutines
+
+        // receiving goroutine
+        go func(){
+            i := <- ch   // data is received form the channel - pulling data from the channel 
+            fmt.Println(i)
+            wg.Done()
+        }()
+
+        // sending goroutine
+        go func(){
+            i := 42
+            ch <- i   // putting data into the channel
+            i = 27 // so this wont be sent to the receiving goroutine 
+            wg.Done()
+        }()
+
+        wg.Wait()
+    }
+    ```
+- multiple gorotuines with a single channel, and one receiver, multiple senders
+  ```
+    func main(){
+        ch := make (chan int)
+        go func () {
+                i := <- ch
+                fmt.Println(i)
+                wg.Done()
+            }()
+
+        for j := 0; j <5; j++ {
+            wg.Add(2)
+            
+
+            go func (){
+                ch <- 42  // unbuffered channel, so it waits till the channel is empty
+                wg.Done()
+            }()
+        }
+        wg.Wait()
+    }
+  ```
+  // this code wil lgive a fatal error 
+- Restricting data flow 
+  ```
+    func main(){
+        ch := make(chan int)  
+        wg.Add(2)
+
+        // receive only channel
+        go func(ch <- chan int){  // data is flowing out of the channel
+            i := <- ch  
+            fmt.Println(i)
+
+            wg.Done()
+        }(ch)
+
+        // send only channel
+        go func(ch chan <- int){
+            ch <- 42  
+            wg.Done()
+        }(ch)
+
+        wg.Wait()
+    }
+  ```
+- Buffered channels
+    ```
+    func main(){
+        ch := make (chan int , 50) // the second parameter is an internal data store i.e. buffer 
+        wg.Add(2)
+
+        go func (ch <- chan int) {
+                // i := <- ch  // this will print the 42
+                // fmt.Println(i)
+                // i = <- ch   // this will print the 27
+                //fmt.Println(i)
+                
+                for i := range ch {
+                    fmt.Println(i)
+                } 
+                wg.Done()
+        }(ch)
+
+        go func (){
+                ch <- 42  
+                ch <- 27
+                close(ch) // letting the channel know that there is nothing else in the channel 
+                wg.Done()
+        }(ch)
+        wg.Wait()
+    }
+    ```
+- Closing channels
+  `close(ch)` \ 
+  either use for...range syntax, or comma ok syntax
+  ```
+    // for range
+    for i := range ch {
+                    fmt.Println(i)
+                }   
+    
+    // comma ok 
+    for {
+        if i, ok := <- ch; ok{
+            fmt.println(i)
+        } else {
+            break
+        }
+    }
+  ```
+- Select statements \
+  used for motinoring channels mostly
+  ```
+    const (
+        logInfo = "INFO"
+        logWarning = "WARNING"
+        logError = "ERROR"
+    )
+
+    type logEntry struct {
+        time time.Time
+        severity string
+        message string
+    }
+
+    var logCh = make (chan logEntry, 50)
+    var doneCh = make (chan struct{})  // zero memory allocation for struct with no variables - signal only channel 
+    
+    func main() {
+        go logger () // monitors the logchannel for log entries 
+
+        // defer func (){  //graceful shutdown of channel 
+        //    close(logCh)
+        // }()
+
+
+        logCh <- logEntry {time.Now(), logInfo, "App is starting"}
+
+        logCh <- logEntry {time.Now(), logInfo, "App is shutting down"}
+        time.Sleep(100 * time.Millisecond)
+        doneCh <- struct{} {} // define empty struct and then initialize it 
+    }
+
+    func logger() {
+        //for entry := range logCh{
+        //     fmt.Printf("%v - [%v]%v\n" , entry.time.Format ("2006-01-02T15:04:05"), entry.severity, entry.message)
+        // }
+
+        for {
+            select {  // blocking select statements 
+                case entry := <- logCh:
+                    fmt.Printf("%v - [%v]%v\n" , entry.time.Format ("2006-01-02T15:04:05"), entry.severity, entry.message)
+                case <- doneCh :
+                    break
+            }
+        }
+    }
+  ```
