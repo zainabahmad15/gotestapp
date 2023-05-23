@@ -1654,4 +1654,41 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
   - design functions and methods to receive interfaces whenever possible
 
 ## Goroutines
+- Creating goroutines - go to main.go file \
+  goroutines are high level threads - basically a lightweight abstraction over a thread \
+- Synchronization 
+- WaitGroups
+  ```
+    //not a good practice to use sleep
+    // so we use wait groups
+    
+    var wg = sync.WaitGroup{}
+    func main(){
+        var msg = "Hello"
+        wg.Add(1)
+        go func(msg string){  
+            fmt.Println(msg)   // so prints Hello 
+            wg.Done()   // decrement the waitgroup by 1
+        }(msg)  //invoked immediately 
 
+        msg = "Goodbye"
+        wg.Wait() // waits for the execution of the goroutine
+    }
+    ```
+- Mutexes \
+  a lock 
+- Parallelism
+  ```
+    func main () {
+        fmt. Printf("Threads: %v\n", runtime.GOMAXPROCS(-1))
+        // number of threads = cores in the os 
+    }
+    // we can increase the threads in Go applications, 
+    // you dont have to necessarily use the thread equal to the number of cores in your OS
+  ```
+- Best practices
+  - dont create goroutines if you are creating libraries - let consumer control concurrency 
+  - when creating a goroutine, know when it will end
+  - check for race conditions at compile time `go run -race main.go` 
+
+## Chanells
