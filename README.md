@@ -1455,4 +1455,203 @@ A [good tutorial](https://www.youtube.com/watch?v=YS4e4q9oBaU) to follow
   When a method is invoked it gets a copy of the greeter object and the object provides the method context 
 
   ## Interfaces 
+- Basics
+    ```
+    package main 
+    import (
+        "fmt"
+    )
+
+    func main() {
+
+        // declare varibale w of type Write and assign it an instance of ConsoleWriter{}
+        var w Write = ConsoleWriter{}
+
+        // cal lWrite method on the w variable passing a slice of byte. this will invoke Write method implemented by ConsoleWriter
+        w.Write ([]byte ("Hello"))
+    }
+
+    // define the Writer interface 
+    // with a single method i.e. Write([]byte) (int, error)
+    // any type that implements this method, is considered to implement the Writer interface
+
+    type Writer interface { // type name typeInterface
+        // interfaces describe behaviours
+        // we will store method definitions here
+        Write([]byte) (int, error) // takes a slice of byte, returns int and error
+    }
+
+    // empty struct with no fields
+    // it will be used to implement the Writer interface
+    // implicitly implement the interface
+    type ConsoleWriter struct {}
+
+    // the Write method implementation for ConsoleWriter type
+    func (cw ConsoleWriter) Write(data []byte)(int,error){
+		//the implementation of the method is what ever we want it to be
+		
+        n,err := fmt.Println(string(data))
+        return n,err
+	}
+    ```
+- naming conventions
+  - name of interfaces which have single method definition must have a name that suggest their purpose and the name must end with er that is the name of the method they define plus er
+  - keyword to create interface is interface
+- any type can have methods associated with it 
+    ```
+    package main 
+    import (
+        "fmt"
+    )
+
+    func main() {
+        myInt := IntCounter(0)
+        var inc Incremeter = &myInt // declare variable inc of type Incrementer and assigns it to pointer myInt - the Incrementer interface is satisfied by the IntCounter type
+        for i := 0, i < 10, i++ {
+            fmt.Println(inc.Increment()) // call Increment method on inc 
+        }
+	}
+
+    type Incrementer interface {
+        Increment() int // a method that returns integer 
+    }
+
+    // type alias for integer - behaves like an int but has a distinct type
+    type IntCounter int 
+
+    func (ic *IntCounter) Increment() int { //method name is Increment that returns int 
+        *ic ++ 
+        return int (*ic)
+    }
+    ```
+- Composing interfaces together
+  ```
+
+    func main() {
+        var wc WriterCloser = NewBufferedWriterCloser()
+        wc.Write([]byte("Hellow tesitng"))
+        wc.Close()
+    }
+    type Writer interface{
+	    Write([]byte)(int,error)
+    }
+
+    type Closer interface{
+        Close() error
+    }
+
+    //we create an interface that composes of other interfaces when we need multiple methods
+    type WriterCloser interface{
+        //interfaces embedded within another interface
+        Writer
+        Closer
+    }
+
+    type BufferedWriterCloser struct{
+        //A composed interface allows us to implement more than one single method interfaces with just one struct 
+	    buffer *bytes.Buffer
+    }
+
+    func(bwc *BufferedWriterCloser) Write(data []byte)(int,error){	
+        n, err := bwc.buffer.Write(data)
+	    if err != nil{
+		    return 0,err
+	    }
+	
+	    v:= make([]byte,8)
+	    for bwc.buffer.Len() > 8{
+            _,err := bwc.buffer.Read(v)
+            if err != nil{
+                  return 0,err
+            }
+            _,err = fmt.Println(string(v))
+            if err != nil{
+                    return 0,err
+            }
+        }
+	    return n,nil	
+    }
+
+    func(bwc *BufferedWriterCloser) Close() error{ // flush rest of the buffer
+        for bwc.buffer.Len() > 0{
+		    data := bwc.buffer.Next(8)
+		    _,err := fmt.Println(string(data))
+		    if err!=nil{
+		    	return err
+		    }
+	    }
+	    return nil
+    }
+
+    //constructer method
+    func NewBufferedWriterCloser() *BufferedWriterCloser{
+    	return &BufferedWriterCloser{
+		    buffer: bytes.NewBuffer([]byte{}),
+	    }
+    }
+  ```
+- Type conversions
+  ```
+    // changing the main fromt the above implementation
+    func main() {
+
+        var wc WriterCloser = NewBufferedWriterCloser()
+        wc.Write([]byte("Hellow tesitng"))
+        wc.Close()
+
+        bwc := wc.(*BufferedWriterCloser) // object.(typetoconvertvariableto)
+        fmt.Println(bwc) // prints address of the buffer  
+        // this might panic if we want to use some inbuilt interface 
+        // e.g.  bwc := wc.(io.Reader)
+    }
+  ```
+  but if we want to use some inbuilt interface, then the application might panic if the method is not found, so we can write a try catch block 
+  ```
+    r, ok := wc.(io.Reader) // this will also work just fine with r, ok := wc.(*BufferedWriterCloser)
+    if ok {
+        fmt.Println(r)
+    } else {
+        fmt.Println("Conversion failed")
+    }
+
+  ```
+- The empty interface \
+  `var emptyInterface interface{}` \
+  anything can be casted to an empty interface \
+  useful when we have multiple incompatible types to work with and we have to figure out some logic to work with them \
+  ```
+  var myObj interface{} = NewBufferedWriterCloser() 
+  if wc,ok:=wc.(WriterCloser);ok{
+		wc.Write([]byte("Hello Youtube listeners, this is a test"))
+		wc.Close()
+	}
+	
+	r,ok:=myObj.(io.Reader)
+	if ok{
+		fmt.Println(r)
+	}else{
+		fmt.Println("Conversion failed")
+	}
+  ```
+- Type switches
+    ```
+    var i interface{} = 0 
+	switch i.(type){
+        //this is called a type switch. Each of the cases in this switch block is going to contain a data type
+	case int:
+		fmt.Println("i is an int")
+	case string:
+		fmt.Println("i is a string")
+	default:
+		fmt.Println("I don't know what i is")
+	}
+    ```
+- Best practices
+  - Use many, small interface
+  - io.Writer, io.Reader, interface{} - some of the most powerful interfaces in Go
+  - dont export interfaces if there is no reason to 
+  - dont export interfaces for types that will be used by package 
+  - design functions and methods to receive interfaces whenever possible
+
+## Goroutines
 
